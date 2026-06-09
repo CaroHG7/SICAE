@@ -1,52 +1,86 @@
-
 package uv.listi.user_service.repository;
-
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import uv.listi.user_service.model.Usuario;
+import uv.listi.user_service.dto.UsuarioPerfilResponse;
 
 @Mapper
 public interface UsuarioRepository {
 
-    @Select("SELECT COUNT(*) FROM usuarios WHERE correo = #{correo}")
-    int existeCorreo(String correo);
+    @Select("""
+        SELECT COUNT(*) 
+        FROM usuario 
+        WHERE email = #{email}
+        """)
+    int existeEmail(String email);
 
-    @Select("SELECT COUNT(*) FROM usuarios WHERE usuario = #{usuario}")
-    int existeUsuario(String usuario);
+    @Select("""
+        SELECT COUNT(*) 
+        FROM usuario 
+        WHERE username = #{username}
+        """)
+    int existeUsername(String username);
 
-    @Select("SELECT COUNT(*) FROM usuarios WHERE clave_usuario = #{claveUsuario}")
+    @Select("""
+        SELECT COUNT(*) 
+        FROM usuario 
+        WHERE "claveUsuario" = #{claveUsuario}
+        """)
     int existeClaveUsuario(String claveUsuario);
 
     @Insert("""
-        INSERT INTO usuarios (
-            id_rol,
-            id_tipo_usuario,
-            id_programa_educativo,
+        INSERT INTO usuario (
             nombre,
-            apellido_paterno,
-            usuario,
-            password,
-            correo,
+            "apellidoPaterno",
+            "apellidoMaterno",
+            "claveUsuario",
+            email,
             telefono,
-            clave_usuario,
+            username,
+            password,
             estatus,
-            tiempo_creacion
+            "idRol",
+            "idTipoUsuario",
+            "idProgramaEducativo",
+            "tiempoCreacion",
+            "tempoActualizacion"
         ) VALUES (
+            #{nombre},
+            #{apellidoPaterno},
+            #{apellidoMaterno},
+            #{claveUsuario},
+            #{email},
+            #{telefono},
+            #{username},
+            #{password},
+            B'1',
             #{idRol},
             #{idTipoUsuario},
             #{idProgramaEducativo},
-            #{nombre},
-            #{apellidoPaterno},
-            #{usuario},
-            #{password},
-            #{correo},
-            #{telefono},
-            #{claveUsuario},
-            #{estatus},
-            #{tiempoCreacion}
+            #{tiempoCreacion},
+            NULL
         )
         """)
     int registrar(Usuario usuario);
+
+    @Select("""
+        SELECT 
+            "idUsuario" AS "idUsuario",
+            rol AS "rol",
+            CONCAT(nombre, ' ', "apellidoPaterno", ' ', COALESCE("apellidoMaterno", '')) AS "nombreCompleto",
+            "tipoUsuario" AS "tipoUsuario",
+            "programaEducativo" AS "programaEducativo",
+            username AS "username",
+            email AS "email",
+            telefono AS "telefono",
+            estatus::text AS "estatus",
+            "claveUsuario" AS "claveUsuario",
+            "tiempoCreacion" AS "tiempoCreacion",
+            "tempoActualizacion" AS "tempoActualizacion"
+        FROM "usuarioFullInfo"
+        WHERE "idUsuario" = #{idUsuario}
+        """)
+    UsuarioPerfilResponse obtenerPerfilPorId(Integer idUsuario);
 }

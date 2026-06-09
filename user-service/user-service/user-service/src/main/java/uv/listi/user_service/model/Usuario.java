@@ -1,26 +1,24 @@
-
-
 package uv.listi.user_service.model;
 
 import java.time.LocalDateTime;
 
 public class Usuario {
+    
     private Integer idUsuario;
+    private String nombre;
+    private String apellidoPaterno;
+    private String apellidoMaterno;
+    private String claveUsuario;
+    private String email;
+    private String telefono;
+    private String username;
+    private String password;
+    private String estatus;
     private Integer idRol;
     private Integer idTipoUsuario;
     private Integer idProgramaEducativo;
-
-    private String nombre;
-    private String apellidoPaterno;
-    private String usuario;
-    private String password;
-    private String correo;
-    private String telefono;
-    private String claveUsuario;
-
-    private Boolean estatus;
     private LocalDateTime tiempoCreacion;
-    private LocalDateTime tiempoActualizacion;
+    private LocalDateTime tempoActualizacion;
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -28,6 +26,78 @@ public class Usuario {
 
     public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getClaveUsuario() {
+        return claveUsuario;
+    }
+
+    public void setClaveUsuario(String claveUsuario) {
+        this.claveUsuario = claveUsuario;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public String getEstatus() {
+        return estatus;
+    }
+
+    public void setEstatus(String estatus) {
+        this.estatus = estatus;
     }
 
     public Integer getIdRol() {
@@ -54,70 +124,6 @@ public class Usuario {
         this.idProgramaEducativo = idProgramaEducativo;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellidoPaterno() {
-        return apellidoPaterno;
-    }
-
-    public void setApellidoPaterno(String apellidoPaterno) {
-        this.apellidoPaterno = apellidoPaterno;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getClaveUsuario() {
-        return claveUsuario;
-    }
-
-    public void setClaveUsuario(String claveUsuario) {
-        this.claveUsuario = claveUsuario;
-    }
-
-    public Boolean getEstatus() {
-        return estatus;
-    }
-
-    public void setEstatus(Boolean estatus) {
-        this.estatus = estatus;
-    }
-
     public LocalDateTime getTiempoCreacion() {
         return tiempoCreacion;
     }
@@ -126,11 +132,11 @@ public class Usuario {
         this.tiempoCreacion = tiempoCreacion;
     }
 
-    public LocalDateTime getTiempoActualizacion() {
-        return tiempoActualizacion;
+    public LocalDateTime getTempoActualizacion() {
+        return tempoActualizacion;
     }
 
-    public void setTiempoActualizacion(LocalDateTime tiempoActualizacion) {
-        this.tiempoActualizacion = tiempoActualizacion;
+    public void setTempoActualizacion(LocalDateTime tempoActualizacion) {
+        this.tempoActualizacion = tempoActualizacion;
     }
 }

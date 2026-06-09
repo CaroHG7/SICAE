@@ -1,4 +1,3 @@
-
 package uv.listi.user_service.service;
 
 import java.time.LocalDateTime;
@@ -7,6 +6,7 @@ import java.util.Random;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.model.Usuario;
@@ -25,33 +25,33 @@ public class UsuarioService {
 
     public UsuarioResponse registrarUsuario(UsuarioRegistroRequest request) {
 
-        if (usuarioRepository.existeCorreo(request.getCorreo()) > 0) {
-            return new UsuarioResponse(false, "Ya existe un usuario registrado con ese correo");
+        if (usuarioRepository.existeEmail(request.getEmail()) > 0) {
+            return new UsuarioResponse(false, "Ya existe un usuario registrado con ese email");
         }
 
-        if (usuarioRepository.existeUsuario(request.getUsuario()) > 0) {
+        if (usuarioRepository.existeUsername(request.getUsername()) > 0) {
             return new UsuarioResponse(false, "Ya existe un usuario registrado con ese username");
         }
 
         Usuario usuario = new Usuario();
 
-        usuario.setIdRol(request.getIdRol());
-        usuario.setIdTipoUsuario(request.getIdTipoUsuario());
-        usuario.setIdProgramaEducativo(request.getIdProgramaEducativo());
         usuario.setNombre(request.getNombre());
         usuario.setApellidoPaterno(request.getApellidoPaterno());
-        usuario.setUsuario(request.getUsuario());
+        usuario.setApellidoMaterno(request.getApellidoMaterno());
+        usuario.setEmail(request.getEmail());
+        usuario.setTelefono(request.getTelefono());
+        usuario.setUsername(request.getUsername());
 
         String passwordCifrada = passwordEncoder.encode(request.getPassword());
         usuario.setPassword(passwordCifrada);
 
-        usuario.setCorreo(request.getCorreo());
-        usuario.setTelefono(request.getTelefono());
+        usuario.setIdRol(request.getIdRol());
+        usuario.setIdTipoUsuario(request.getIdTipoUsuario());
+        usuario.setIdProgramaEducativo(request.getIdProgramaEducativo());
 
         String claveGenerada = generarClaveUsuario();
         usuario.setClaveUsuario(claveGenerada);
 
-        usuario.setEstatus(true);
         usuario.setTiempoCreacion(LocalDateTime.now());
 
         int filasAfectadas = usuarioRepository.registrar(usuario);
@@ -61,6 +61,15 @@ public class UsuarioService {
         }
 
         return new UsuarioResponse(false, "No se pudo registrar el usuario");
+    }
+
+    public UsuarioPerfilResponse obtenerPerfil(Integer idUsuario) {
+
+        if (idUsuario == null || idUsuario <= 0) {
+            return null;
+        }
+
+        return usuarioRepository.obtenerPerfilPorId(idUsuario);
     }
 
     private String generarClaveUsuario() {

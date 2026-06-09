@@ -1,4 +1,3 @@
-
 package uv.listi.user_service.controller;
 
 import jakarta.validation.Valid;
@@ -6,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.service.UsuarioService;
@@ -22,7 +22,7 @@ public class UsuarioController {
 
     @GetMapping("/test")
     public String test() {
-        return "UserService funcionando correctamente";
+        return "UserService funcionando correctamente con BD oficial";
     }
 
     @PostMapping
@@ -36,5 +36,19 @@ public class UsuarioController {
         }
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("/{idUsuario}")
+    public ResponseEntity<?> obtenerPerfil(@PathVariable Integer idUsuario) {
+
+        UsuarioPerfilResponse perfil = usuarioService.obtenerPerfil(idUsuario);
+
+        if (perfil == null) {
+            return ResponseEntity.badRequest().body(
+                    new UsuarioResponse(false, "No se encontró el usuario solicitado")
+            );
+        }
+
+        return ResponseEntity.ok(perfil);
     }
 }
