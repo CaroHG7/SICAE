@@ -9,6 +9,8 @@ import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.service.UsuarioService;
+import uv.listi.user_service.dto.UsuarioEditarRequest;
+import uv.listi.user_service.dto.UsuarioEstatusRequest;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -20,12 +22,12 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/test")
+    @GetMapping("/test") //prueba
     public String test() {
         return "UserService funcionando correctamente con BD oficial";
     }
 
-    @PostMapping
+    @PostMapping //crear usuario
     public ResponseEntity<UsuarioResponse> registrarUsuario(
             @Valid @RequestBody UsuarioRegistroRequest request) {
 
@@ -38,7 +40,7 @@ public class UsuarioController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @GetMapping("/{idUsuario}")
+    @GetMapping("/{idUsuario}") //info usuario x id
     public ResponseEntity<?> obtenerPerfil(@PathVariable Integer idUsuario) {
 
         UsuarioPerfilResponse perfil = usuarioService.obtenerPerfil(idUsuario);
@@ -50,5 +52,33 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(perfil);
+    }
+    
+    @PutMapping("/{idUsuario}") //editar
+    public ResponseEntity<UsuarioResponse> editarUsuario(
+            @PathVariable Integer idUsuario,
+            @Valid @RequestBody UsuarioEditarRequest request) {
+
+        UsuarioResponse response = usuarioService.editarUsuario(idUsuario, request);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @PatchMapping("/{idUsuario}/estatus") //cambiar estatus
+    public ResponseEntity<UsuarioResponse> cambiarEstatus(
+            @PathVariable Integer idUsuario,
+            @Valid @RequestBody UsuarioEstatusRequest request) {
+
+        UsuarioResponse response = usuarioService.cambiarEstatus(idUsuario, request);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.badRequest().body(response);
     }
 }

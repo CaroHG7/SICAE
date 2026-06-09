@@ -11,6 +11,8 @@ import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.model.Usuario;
 import uv.listi.user_service.repository.UsuarioRepository;
+import uv.listi.user_service.dto.UsuarioEditarRequest;
+import uv.listi.user_service.dto.UsuarioEstatusRequest;
 
 @Service
 public class UsuarioService {
@@ -82,5 +84,61 @@ public class UsuarioService {
         } while (usuarioRepository.existeClaveUsuario(clave) > 0);
 
         return clave;
+    }
+    
+    public UsuarioResponse editarUsuario(Integer idUsuario, UsuarioEditarRequest request) {
+
+        if (idUsuario == null || idUsuario <= 0) {
+            return new UsuarioResponse(false, "El idUsuario no es válido");
+        }
+
+        if (usuarioRepository.existeUsuarioPorId(idUsuario) == 0) {
+            return new UsuarioResponse(false, "No existe el usuario que deseas editar");
+        }
+
+        if (usuarioRepository.existeEmailEnOtroUsuario(request.getEmail(), idUsuario) > 0) {
+            return new UsuarioResponse(false, "Ya existe otro usuario registrado con ese email");
+        }
+
+        int filasAfectadas = usuarioRepository.editarUsuario(
+                idUsuario,
+                request.getNombre(),
+                request.getApellidoPaterno(),
+                request.getApellidoMaterno(),
+                request.getEmail(),
+                request.getTelefono(),
+                request.getIdRol(),
+                request.getIdTipoUsuario(),
+                request.getIdProgramaEducativo()
+        );
+
+        if (filasAfectadas > 0) {
+            return new UsuarioResponse(true, "Usuario actualizado correctamente");
+        }
+
+        return new UsuarioResponse(false, "No se pudo actualizar el usuario");
+    }
+
+    public UsuarioResponse cambiarEstatus(Integer idUsuario, UsuarioEstatusRequest request) {
+
+        if (idUsuario == null || idUsuario <= 0) {
+            return new UsuarioResponse(false, "El idUsuario no es válido");
+        }
+
+        if (usuarioRepository.existeUsuarioPorId(idUsuario) == 0) {
+            return new UsuarioResponse(false, "No existe el usuario solicitado");
+        }
+
+        int filasAfectadas = usuarioRepository.cambiarEstatus(idUsuario, request.getEstatus());
+
+        if (filasAfectadas > 0) {
+            String mensaje = request.getEstatus()
+                    ? "Usuario activado correctamente"
+                    : "Usuario desactivado correctamente";
+
+            return new UsuarioResponse(true, mensaje);
+        }
+
+        return new UsuarioResponse(false, "No se pudo cambiar el estatus del usuario");
     }
 }
