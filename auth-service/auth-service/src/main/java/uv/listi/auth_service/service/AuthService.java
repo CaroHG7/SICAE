@@ -6,16 +6,19 @@ import uv.listi.auth_service.dto.LoginRequest;
 import uv.listi.auth_service.dto.LoginResponse;
 import uv.listi.auth_service.model.UsuarioAuth;
 import uv.listi.auth_service.repository.AuthRepository;
+import uv.listi.auth_service.security.JwtUtil;
 
 @Service
 public class AuthService {
 
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -45,10 +48,12 @@ public class AuthService {
             nombreCompleto += " " + usuarioOpt.getApellidoMaterno();
         }
 
+        String token = jwtUtil.generarToken(usuarioOpt);
+
         return new LoginResponse(
                 true,
                 "Login correcto",
-                null,
+                token,
                 usuarioOpt.getIdUsuario(),
                 usuarioOpt.getIdRol(),
                 usuarioOpt.getRol(),
