@@ -46,3 +46,10 @@ Para comunicarte con los otros servicios, manda el token en los headers de la pe
 ```http
 Authorization: Bearer <TU_TOKEN>
 ```
+
+### 7. Validar un token
+Para comprobar si un token es válido, llama al siguiente endpoint pasando el token en el header:
+```bash
+curl -i http://localhost:8081/auth/validar \
+  -H "Authorization: Bearer TOKEN_AQUI"
+```
