@@ -20,11 +20,11 @@ public class JwtUtil {
 
     public String generarToken(UsuarioAuth usuario) {
         try {
-            // 1. Header
+            //  header del JWT
             String header = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
             String headerBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(header.getBytes(StandardCharsets.UTF_8));
 
-            // 2. Payload
+            // colocamos la información del usuario en el payload
             long nowMillis = System.currentTimeMillis();
             long expMillis = nowMillis + expiration;
 
@@ -41,7 +41,7 @@ public class JwtUtil {
             );
             String payloadBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
 
-            // 3. Signature
+            // generamos la firma con nuestra clave secreta para evitar modificaciones
             String signatureData = headerBase64 + "." + payloadBase64;
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
@@ -49,7 +49,7 @@ public class JwtUtil {
             byte[] signatureBytes = mac.doFinal(signatureData.getBytes(StandardCharsets.UTF_8));
             String signatureBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(signatureBytes);
 
-            // 4. JWT Final
+            // unimos las tres partes con puntos, tal como vimos en clase
             return signatureData + "." + signatureBase64;
 
         } catch (Exception e) {
@@ -63,6 +63,7 @@ public class JwtUtil {
             return false;
         }
 
+        // dividimos el token para asegurar que tenga header, payload y firma
         String[] parts = token.split("\\.");
         if (parts.length != 3) {
             return false;
@@ -72,6 +73,7 @@ public class JwtUtil {
             String headerAndPayload = parts[0] + "." + parts[1];
             String firmaCalculada = calcularFirma(headerAndPayload);
 
+            // comprobamos que la firma coincida para confirmar que no fue alterado
             if (!firmaCalculada.equals(parts[2])) {
                 return false;
             }
@@ -79,6 +81,7 @@ public class JwtUtil {
             String payloadJson = decodificarPayload(parts[1]);
             String expString = obtenerValorNumericoClaim(payloadJson, "exp");
 
+            // verificamos la fecha de expiración del token
             if (expString != null) {
                 long exp = Long.parseLong(expString);
                 long now = System.currentTimeMillis() / 1000;
@@ -89,7 +92,7 @@ public class JwtUtil {
                 return false;
             }
 
-            return true;
+            return true; 
         } catch (Exception e) {
             return false;
         }
