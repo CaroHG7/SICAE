@@ -1,0 +1,63 @@
+service:
+    bd_usuarios:
+        image: postgres:16
+        container_name: bd_usuarios
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: sicae_usuarios
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        volumes:
+            - datos_usuarios:/var/lib/postgresql/data
+            - ../databases/BD/PostgreSQL/sicaeUsuarios.sql:/docker-entrypoint-initdb.d/sicaeUsuarios.sql
+
+        networks:
+            - sicae_network
+
+
+    auth-service:
+        build: ../auth-service
+        container_name: auth-service
+        ports:
+            - "8080:8080"
+        environment:
+            SERVER_PORT: 8080
+            SPRING_DATASOURCE_URL: jdbc:postgresql://bd_usuarios:5432/sicae_usuarios
+            SPRING_DATASOURCE_USERNAME: user
+            SPRING_DATASOURCE_PASSWORD: password
+            JWT_SECRET: secretkey
+        depends_on:
+            - bd_usuarios
+        networks:
+            - sicae_network
+
+
+
+
+    user-service:
+        build: ../user-service/user-service
+        container_name: user-service
+        ports:
+            - "8081:8081"
+        environment:
+            SERVER_PORT: 8081
+            URL: jdbc:postgresql://bd_usuarios:5432/sicae_usuarios
+            USERNAME: user
+            PASSWORD: password
+            JWT_SECRET: secretkey
+            AUTH_SERVICE_URL: http://auth-service:8080
+        depends_on:
+            - bd_usuarios
+            - auth-service
+        networks:
+            - sicae_network
+    
+    
+    volumes:
+        datos_usuarios:
+
+    networks:
+        sicae_network:
+        external: true
+            

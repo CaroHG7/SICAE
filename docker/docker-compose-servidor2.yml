@@ -1,0 +1,42 @@
+service:
+    bd-vehiculos:
+        image: mysql:8
+        container_name: bd-vehiculos
+        ports:
+            - "3307:3306"
+        environment:
+            DATABASE: sicae_vehiculos
+            USER: user
+            PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - datos_vehiculos:/var/lib/mysql
+            - ../databases/BD/MySQL/sicaevehiculo.sql
+        networks:
+            - sicae_network
+
+
+    vehicle-service:
+        build: ../vehicle-service/vehicle-service
+        container_name: vehicle-service
+        ports:
+            - "8082:8080"
+        environment:
+            URL: jdbc:mysql://bd-vehiculos:3306/sicae_vehiculos
+            USERNAME: user
+            PASSWORD: password
+            JWT_SECRET: secretkey
+            AUTH_SERVICE_URL: http://auth-service:8080
+            USER_SERVICE_URL: http://user-service:8081
+        depends_on:
+            - bd-vehiculos 
+        networks:
+            - sicae_network
+
+
+    volumes:
+        datos_vehiculos:
+
+    networks:
+        sicae_network:
+            external: true
