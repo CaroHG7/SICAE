@@ -11,11 +11,10 @@ public class ParkingSalidaResponse {
     private Integer idMovimiento;
     private LocalDateTime tiempoEntrada;
     private LocalDateTime tiempoSalida;
-    private String espacio;
+    private Integer espacio;
     private BigDecimal tarifa;
     private BigDecimal costoTotal;
     private Integer horasCobradas;
-
     private String mensaje;
 
     

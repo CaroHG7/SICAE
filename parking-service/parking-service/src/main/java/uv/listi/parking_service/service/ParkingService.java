@@ -2,25 +2,17 @@ package uv.listi.parking_service.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
+import uv.listi.parking_service.dto.ParkingEntradaRequest;
+import uv.listi.parking_service.dto.ParkingEntradaResponse;
+import uv.listi.parking_service.dto.ParkingSalidaRequest;
+import uv.listi.parking_service.dto.ParkingSalidaResponse;
 import uv.listi.parking_service.model.Espacio;
-import uv.listi.parking_service.repository.EspacioRepository;
-import uv.listi.parking_service.repository.MovimientoRepository;
-
-@Service
-public class ParkingService {
-    private final EspacioRepository espacioRepository;
-    private final MovimientoRepository movimientoRepository;
 
 
-    public ParkingService(EspacioRepository espacioRepository, MovimientoRepository movimientoRepository) {
-        this.espacioRepository = espacioRepository;
-        this.movimientoRepository = movimientoRepository;
-    }
+public interface ParkingService {
 
-    public List<Espacio> consultarEspacios(){
-        return espacioRepository.buscarTodos();
-    }
+    ParkingEntradaResponse registrarEntrada(ParkingEntradaRequest request, String token);
+    ParkingSalidaResponse registrarSalida(ParkingSalidaRequest request, String token);
+    public List<Espacio> consultarEspacios(String token);
     
 }

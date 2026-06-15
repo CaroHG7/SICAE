@@ -10,6 +10,7 @@ import lombok.Data;
 public class Movimiento {
 
     private Integer idMovimiento;
+    private Integer idVehiculo;
     private String claveUsuario;
     private String placa;
     private Integer idEspacio;
@@ -20,6 +21,7 @@ public class Movimiento {
     private Integer horasCobradas;
     private BigDecimal costoTotal;
     private LocalDateTime tiempoActualizacion;
+    private LocalDateTime tiempoCreacion;
 
 
 
@@ -27,12 +29,13 @@ public class Movimiento {
     public Movimiento() {
     }
     
-    public Movimiento(Integer idMovimiento, String claveUsuario, String placa, Integer idEspacio, LocalDateTime entrada,
+    public Movimiento(Integer idMovimiento, Integer idVehiculo, String claveUsuario, String placa, Integer idEspacio, LocalDateTime entrada,
             LocalDateTime salida, BigDecimal tarifa, Integer minEstacionado, Integer horasCobradas,
-            BigDecimal costoTotal, LocalDateTime tiempoActualizacion) {
+            BigDecimal costoTotal, LocalDateTime tiempoActualizacion, LocalDateTime tiempoCreacion) {
         this.idMovimiento = idMovimiento;
         this.claveUsuario = claveUsuario;
         this.placa = placa;
+        this.idVehiculo = idVehiculo;
         this.idEspacio = idEspacio;
         this.entrada = entrada;
         this.salida = salida;
@@ -41,6 +44,7 @@ public class Movimiento {
         this.horasCobradas = horasCobradas;
         this.costoTotal = costoTotal;
         this.tiempoActualizacion = tiempoActualizacion;
+        this.tiempoCreacion = tiempoCreacion;
     }
     public Integer getIdMovimiento() {
         return idMovimiento;

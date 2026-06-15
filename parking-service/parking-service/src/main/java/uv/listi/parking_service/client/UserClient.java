@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class UserClient {
 
-    private final RestTemplate restTemplate;
+    /** private final RestTemplate restTemplate;
 
     @Value("${usuario.service.url}")
     private String usuarioServiceUrl;
@@ -16,7 +16,7 @@ public class UserClient {
         this.restTemplate = restTemplate;
     }
 
-
+**/
     public Boolean usuarioActivo(String claveUsuario, String token ) { 
         
         return true;
