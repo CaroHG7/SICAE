@@ -13,7 +13,7 @@ services:
             
         volumes:
             - datos_estacionamiento:/var/lib/mysql
-            - ./databases/BD/MySQL/sicaeestacionamiento.sql:/docker-entrypoint-initdb.d/sicaeestacionamiento.sql
+            - ../databases/BD/MySQL/sicaeestacionamiento.sql:/docker-entrypoint-initdb.d/sicaeestacionamiento.sql
         networks:
             - sicae_network
 
@@ -24,7 +24,7 @@ services:
     
     
     parking-service:
-        build: ./parking-service/parking-service
+        build: ../parking-service/parking-service
         container_name: parking-service 
         ports:
             - "8083:8083"
@@ -49,9 +49,9 @@ services:
 
 
 
-    volumes:
+volumes:
         datos_estacionamiento:
 
-    networks:
+networks:
         sicae_network:
             external: true  
