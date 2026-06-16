@@ -18,4 +18,21 @@ public class ParkingSalidaResponse {
     private String mensaje;
 
     
+    public ParkingSalidaResponse(Integer idMovimiento, LocalDateTime tiempoEntrada, LocalDateTime tiempoSalida,
+            Integer espacio, BigDecimal tarifa, BigDecimal costoTotal, Integer horasCobradas, String mensaje) {
+        this.idMovimiento = idMovimiento;
+        this.tiempoEntrada = tiempoEntrada;
+        this.tiempoSalida = tiempoSalida;
+        this.espacio = espacio;
+        this.tarifa = tarifa;
+        this.costoTotal = costoTotal;
+        this.horasCobradas = horasCobradas;
+        this.mensaje = mensaje;
+    }
+
+
+
+    
+
+    
 }

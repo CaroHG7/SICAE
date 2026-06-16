@@ -1,41 +1,49 @@
-service:
-    parking-service:
-        build: ../parking-service/parking-service
-        container_name: parking-service 
-        ports:
-            - "8083:8083"
-        environment:
-            SERVER_PORT: 8083
-            URL: jdbc:mysql://bd-estacionamiento:3306/sicae_estacionamiento
-            USERNAME: user
-            PASSWORD: password
-            JWT_SECRET: secretkey
-            AUTH_SERVICE_URL: http://auth-service:8080
-            USER_SERVICE_URL: http://user-service:8081
-            VEHICLE_SERVICE_URL: http://vehicle-service:8082
-        depends_on:
-            - bd-estacionamiento 
-        networks:
-            - sicae_network
-
-
-
-
+services:
+    
+    
+    
     bd-estacionamiento:
         image: mysql:8
         container_name: bd-estacionamiento
         ports:
             - "3308:3306"
         environment:
+            MYSQL_DATABASE: sicaeParking
             MYSQL_ROOT_PASSWORD: root
-            DATABASE: sicae_estacionamiento
-            USER: user
-            PASSWORD: password
+            
         volumes:
             - datos_estacionamiento:/var/lib/mysql
-            - ../databases/BD/MySQL/sicaeestacionamiento.sql:/docker-entrypoint-initdb.d/sicaeestacionamiento.sql
+            - ./databases/BD/MySQL/sicaeestacionamiento.sql:/docker-entrypoint-initdb.d/sicaeestacionamiento.sql
         networks:
             - sicae_network
+
+
+
+    
+    
+    
+    
+    parking-service:
+        build: ./parking-service/parking-service
+        container_name: parking-service 
+        ports:
+            - "8083:8083"
+        environment:
+            SERVER_PORT: 8083
+            SPRING_DATASOURCE_URL: jdbc:mysql://bd-estacionamiento:3306/sicaeParking
+            SPRING_DATASOURCE_USERNAME: root
+            SPRING_DATASOURCE_PASSWORD: root
+            JWT_SECRET: secretkey
+            AUTH_SERVICE_URL: http://auth-service:8080
+            USER_SERVICE_URL: http://user-service:8081
+            VEHICLE_SERVICE_URL: http://vehicle-service:8082
+        depends_on:
+            - bd-estacionamiento 
+        
+        networks:
+            - sicae_network
+
+
 
 
 

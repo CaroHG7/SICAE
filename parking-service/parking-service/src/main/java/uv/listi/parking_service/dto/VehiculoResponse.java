@@ -10,6 +10,11 @@ public class VehiculoResponse {
     private Integer idUsuario;
     
 
+    public VehiculoResponse(Integer idVehiculo, String placa, Integer idUsuario) {
+        this.idVehiculo = idVehiculo;
+        this.placa = placa;
+        this.idUsuario = idUsuario;
+    }
     public Integer getIdVehiculo() {
         return idVehiculo;
     }

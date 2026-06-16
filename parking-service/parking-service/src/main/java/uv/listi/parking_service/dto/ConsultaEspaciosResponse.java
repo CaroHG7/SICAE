@@ -11,4 +11,17 @@ public class ConsultaEspaciosResponse {
     private Boolean estatus;
 
     
+    public ConsultaEspaciosResponse(Integer idEspacio, String claveEspacio, String tipo, Boolean ocupado,
+            Boolean estatus) {
+        this.idEspacio = idEspacio;
+        this.claveEspacio = claveEspacio;
+        this.tipo = tipo;
+        this.ocupado = ocupado;
+        this.estatus = estatus;
+    }
+
+
+    
+
+    
 }

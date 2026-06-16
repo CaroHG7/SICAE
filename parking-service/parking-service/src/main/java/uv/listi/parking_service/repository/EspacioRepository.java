@@ -1,6 +1,7 @@
 package uv.listi.parking_service.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,6 +18,10 @@ public interface EspacioRepository {
             """)
             Espacio buscarPorID(Integer idEspacio);
 
+    @Select("""
+            SELECT * FROM espacioestacionamiento WHERE idEspacio = #{idEspacio}
+            """)
+            Optional<Espacio> buscarPorId(Integer idEspacio);
 
     @Select("""
             select * from espacioestacionamiento where estatus = 1

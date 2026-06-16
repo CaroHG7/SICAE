@@ -1,5 +1,6 @@
 package uv.listi.parking_service.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,6 @@ import uv.listi.parking_service.model.Espacio;
 import uv.listi.parking_service.model.Movimiento;
 import uv.listi.parking_service.repository.EspacioRepository;
 import uv.listi.parking_service.repository.MovimientoRepository;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,9 +32,12 @@ public class ParkingServiceImplement implements ParkingService{
     private final MovimientoRepository movimientoRepository;
     private final EspacioRepository espacioRepository;
 
-    private final String userServiceUrl = "http://localhost:8081/api/users/";
-    private final String vehicleServiceUrl = "http://localhost:8082/api/vehicles/";
+    @Value("${user.service.url}")
+    private String userServiceUrl;
 
+    @Value("${vehicle.service.url}")
+    private String vehicleServiceUrl;
+    
     public ParkingServiceImplement(RestTemplate restTemplate, JwtUtil jwtUtil, MovimientoRepository movimientoRepository, EspacioRepository espacioRepository) {
         this.restTemplate = restTemplate;
         this.jwtUtil = jwtUtil;
@@ -48,7 +50,7 @@ public class ParkingServiceImplement implements ParkingService{
 
         String tokenObtenido = jwtUtil.obtenerToken(token);
 
-        if (tokenObtenido != null || !jwtUtil.validarToken(token)) {
+        if (tokenObtenido == null || !jwtUtil.validarToken(token)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No puede acceder. El token es inválido");
         }
     }
@@ -57,7 +59,7 @@ public class ParkingServiceImplement implements ParkingService{
     @Override
     public ParkingEntradaResponse registrarEntrada(ParkingEntradaRequest request, String token) {
         verificarToken(token);
-        if(request.getClaveUsuario() !=null || request.getPlaca() != null || request.getIdEspacio()==null ||request.getTarifa()==null){
+        if(request.getClaveUsuario() == null || request.getPlaca() == null || request.getIdEspacio() == null || request.getTarifa() == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faltan alguno de los datos requeridos: clave de usuario, placa, id del espacio o la tarifa");
             
         }
@@ -73,7 +75,7 @@ public class ParkingServiceImplement implements ParkingService{
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El vehiculo con la placa proporcionada no existe");
             }
 
-            if(!vehiculoResponse.getIdUsuario().equals(request.getClaveUsuario())){
+            if(!vehiculoResponse.getIdUsuario().toString().equals(request.getClaveUsuario())){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vehiculo no pertenece al usuario que intenta ingresar");
 
             }
@@ -140,7 +142,7 @@ public class ParkingServiceImplement implements ParkingService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El vehiculo con la placa proporcionada no existe");
         }
 
-        if(!vehiculoResponse.getIdUsuario().equals(request.getClaveUsuario())){
+        if(!vehiculoResponse.getIdUsuario().toString().equals(request.getClaveUsuario())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vehiculo no pertenece al usuario que intenta ingresar");
 
         }

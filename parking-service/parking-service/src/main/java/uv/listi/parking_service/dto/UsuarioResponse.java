@@ -9,7 +9,13 @@ public class UsuarioResponse {
     private String claveUsuario;
     private boolean status;
 
+    
 
+    public UsuarioResponse(Integer idUsuario, String claveUsuario, boolean status) {
+        this.idUsuario = idUsuario;
+        this.claveUsuario = claveUsuario;
+        this.status = status;
+    }
     public Integer getIdUsuario() {
         return idUsuario;
     }
