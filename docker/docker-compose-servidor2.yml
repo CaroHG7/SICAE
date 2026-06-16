@@ -1,0 +1,41 @@
+services:
+    bd-vehiculos:
+        image: mysql:8
+        container_name: bd-vehiculos
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_DATABASE: sicaevehiculo
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - datos_vehiculos:/var/lib/mysql
+            - ../databases/BD/MySQL/sicaevehiculo.sql:/docker-entrypoint-initdb.d/sicaevehiculo.sql
+        networks:
+            - sicae_network
+
+
+    vehicle-service:
+        build: ../vehicle-service/vehicle-service
+        container_name: vehicle-service
+        ports:
+            - "8082:8082"
+        environment:
+            SERVER_PORT: 8082
+            SPRING_DATASOURCE_URL: jdbc:mysql://bd-vehiculos:3306/sicaevehiculos
+            SPRING_DATASOURCE_USERNAME: root
+            SPRING_DATASOURCE_PASSWORD: root
+            AUTH_SERVICE_URL: http://auth-service:8080
+            USER_SERVICE_URL: http://user-service:8081
+        depends_on:
+            - bd-vehiculos 
+
+        networks:
+            - sicae_network
+
+
+volumes:
+        datos_vehiculos:
+
+networks:
+        sicae_network:
+            external: true

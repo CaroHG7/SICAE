@@ -1,16 +1,22 @@
 package uv.listi.user_service.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+import uv.listi.user_service.dto.UsuarioEditarRequest;
+import uv.listi.user_service.dto.UsuarioEstatusRequest;
 import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.service.UsuarioService;
-import uv.listi.user_service.dto.UsuarioEditarRequest;
-import uv.listi.user_service.dto.UsuarioEstatusRequest;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -48,6 +54,25 @@ public class UsuarioController {
         if (perfil == null) {
             return ResponseEntity.badRequest().body(
                     new UsuarioResponse(false, "No se encontró el usuario solicitado")
+            );
+        }
+
+        return ResponseEntity.ok(perfil);
+    }
+
+    @GetMapping("/clave/{claveUsuario}")
+    public ResponseEntity<?> obtenerPerfilPorClave(
+            @PathVariable String claveUsuario) {
+
+        UsuarioPerfilResponse perfil =
+                usuarioService.obtenerPerfilPorClave(claveUsuario);
+
+        if (perfil == null) {
+            return ResponseEntity.badRequest().body(
+                    new UsuarioResponse(
+                            false,
+                            "No se encontró el usuario solicitado"
+                    )
             );
         }
 

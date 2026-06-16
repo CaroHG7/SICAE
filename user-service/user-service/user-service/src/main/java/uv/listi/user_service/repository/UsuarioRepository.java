@@ -2,11 +2,12 @@ package uv.listi.user_service.repository;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import uv.listi.user_service.model.Usuario;
-import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import uv.listi.user_service.dto.UsuarioPerfilResponse;
+import uv.listi.user_service.model.Usuario;
 
 @Mapper
 public interface UsuarioRepository {
@@ -85,6 +86,31 @@ public interface UsuarioRepository {
         WHERE "idUsuario" = #{idUsuario}
         """)
     UsuarioPerfilResponse obtenerPerfilPorId(Integer idUsuario);
+
+    @Select("""
+    SELECT 
+        "idUsuario" AS "idUsuario",
+        rol AS "rol",
+        CONCAT(
+            nombre,
+            ' ',
+            "apellidoPaterno",
+            ' ',
+            COALESCE("apellidoMaterno", '')
+        ) AS "nombreCompleto",
+        "tipoUsuario" AS "tipoUsuario",
+        "programaEducativo" AS "programaEducativo",
+        username AS "username",
+        email AS "email",
+        telefono AS "telefono",
+        estatus::text AS "estatus",
+        "claveUsuario" AS "claveUsuario",
+        "tiempoCreacion" AS "tiempoCreacion",
+        "tempoActualizacion" AS "tempoActualizacion"
+    FROM "usuarioFullInfo"
+    WHERE "claveUsuario" = #{claveUsuario}
+    """)
+    UsuarioPerfilResponse obtenerPerfilPorClave(String claveUsuario);
     
     @Select("""
         SELECT COUNT(*) 

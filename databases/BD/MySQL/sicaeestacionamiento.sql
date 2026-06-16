@@ -142,7 +142,7 @@ CREATE TABLE `movimiento`  (
   `idMovimiento` int NOT NULL AUTO_INCREMENT,
   `idVehiculo` int NOT NULL,
   `tiempoEntrada` timestamp NOT NULL,
-  `tiempoSalida` timestamp NOT NULL,
+  `tiempoSalida` timestamp NULL DEFAULT NULL,
   `minutosEstacionado` int NULL DEFAULT NULL,
   `horasCobradas` int NULL DEFAULT NULL,
   `costoTotal` decimal(10, 2) NULL DEFAULT NULL,
