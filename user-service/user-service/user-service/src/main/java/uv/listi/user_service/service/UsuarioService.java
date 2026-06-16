@@ -6,13 +6,13 @@ import java.util.Random;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import uv.listi.user_service.dto.UsuarioEditarRequest;
+import uv.listi.user_service.dto.UsuarioEstatusRequest;
 import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.model.Usuario;
 import uv.listi.user_service.repository.UsuarioRepository;
-import uv.listi.user_service.dto.UsuarioEditarRequest;
-import uv.listi.user_service.dto.UsuarioEstatusRequest;
 
 @Service
 public class UsuarioService {
@@ -140,5 +140,14 @@ public class UsuarioService {
         }
 
         return new UsuarioResponse(false, "No se pudo cambiar el estatus del usuario");
+    }
+
+    public UsuarioPerfilResponse obtenerPerfilPorClave(String claveUsuario) {
+
+        if (claveUsuario == null || claveUsuario.isBlank()) {
+            return null;
+        }
+
+        return usuarioRepository.obtenerPerfilPorClave(claveUsuario.trim());
     }
 }

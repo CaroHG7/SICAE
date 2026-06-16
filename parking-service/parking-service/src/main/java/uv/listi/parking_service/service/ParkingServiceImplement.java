@@ -1,9 +1,16 @@
 package uv.listi.parking_service.service;
 
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,10 +26,6 @@ import uv.listi.parking_service.model.Espacio;
 import uv.listi.parking_service.model.Movimiento;
 import uv.listi.parking_service.repository.EspacioRepository;
 import uv.listi.parking_service.repository.MovimientoRepository;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ParkingServiceImplement implements ParkingService{
@@ -57,6 +60,7 @@ public class ParkingServiceImplement implements ParkingService{
 
 
     @Override
+    @Transactional
     public ParkingEntradaResponse registrarEntrada(ParkingEntradaRequest request, String token) {
         verificarToken(token);
         if(request.getClaveUsuario() == null || request.getPlaca() == null || request.getIdEspacio() == null || request.getTarifa() == null){
@@ -65,35 +69,73 @@ public class ParkingServiceImplement implements ParkingService{
         }
 
         try{
-            UsuarioResponse usuarioResponse = restTemplate.getForObject(userServiceUrl + request.getClaveUsuario(), UsuarioResponse.class);
-            if(usuarioResponse == null || Boolean.FALSE.equals(usuarioResponse.getStatus())){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no existe o su estatus no es activo");
+            UsuarioResponse usuarioResponse = restTemplate.getForObject(
+                    userServiceUrl + "usuarios/clave/" + request.getClaveUsuario(),
+                    UsuarioResponse.class
+            );
+
+            if (usuarioResponse == null || !usuarioResponse.estaActivo()) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "El usuario no existe o su estatus no es activo"
+                );
             }
 
-            VehiculoResponse vehiculoResponse = restTemplate.getForObject(vehicleServiceUrl + request.getPlaca(), VehiculoResponse.class);
-            if(vehiculoResponse == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El vehiculo con la placa proporcionada no existe");
+            ResponseEntity<VehiculoResponse[]> responseVehiculos =
+                    restTemplate.getForEntity(
+                            vehicleServiceUrl + "usuario/" + usuarioResponse.getIdUsuario(),
+                            VehiculoResponse[].class
+                    );
+
+            VehiculoResponse[] vehiculos =
+                    responseVehiculos.getBody();
+
+            if (vehiculos == null) {
+                vehiculos = new VehiculoResponse[0];
             }
 
-            if(!vehiculoResponse.getIdUsuario().toString().equals(request.getClaveUsuario())){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vehiculo no pertenece al usuario que intenta ingresar");
+            VehiculoResponse vehiculoResponse = null;
 
+            for (VehiculoResponse vehiculo : vehiculos) {
+                if (vehiculo.getPlaca() != null
+                        && vehiculo.getPlaca().equalsIgnoreCase(request.getPlaca())) {
+                    vehiculoResponse = vehiculo;
+                    break;
+                }
             }
 
-            ResponseEntity<List> responseVehiculos=restTemplate.getForEntity(vehicleServiceUrl + "user/" + request.getClaveUsuario(), List.class);
-            List<LinkedHashMap<String, Object>> vehiculosUsuario = responseVehiculos.getBody();
+            if (vehiculoResponse == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "El vehículo con la placa proporcionada no pertenece al usuario"
+                );
+            }
 
-            if(vehiculosUsuario!=null && !vehiculosUsuario.isEmpty()){
-                String vehiculosUsuarioStr = vehiculosUsuario.stream()
-                    .map(vehiculo -> vehiculo.get("idVehiculo").toString())
+            if (!vehiculoResponse.estaActivo()) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "El vehículo se encuentra inactivo"
+                );
+            }
+
+            String vehiculosUsuarioStr = java.util.Arrays.stream(vehiculos)
+                    .map(VehiculoResponse::getIdVehiculo)
+                    .filter(java.util.Objects::nonNull)
+                    .map(String::valueOf)
                     .collect(Collectors.joining(","));
 
-                int vehiculosDentro = movimientoRepository.movimientosUsuario(vehiculosUsuarioStr);
-                if(vehiculosDentro >= 2){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario ya tiene 2 vehiculos dentro del estacionamiento");
-                }
+            if (!vehiculosUsuarioStr.isBlank()) {
+                int vehiculosDentro =
+                        movimientoRepository.movimientosUsuario(vehiculosUsuarioStr);
 
+                if (vehiculosDentro >= 2) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "El usuario ya tiene 2 vehículos dentro del estacionamiento"
+                    );
+                }
             }
+
             
             Espacio espacio = espacioRepository.buscarPorID(request.getIdEspacio());
             if(espacio == null|| Boolean.TRUE.equals(espacio.getOcupado())){
@@ -115,72 +157,171 @@ public class ParkingServiceImplement implements ParkingService{
             movimientoRepository.crearMovimiento(movimiento);
             return new ParkingEntradaResponse(movimiento.getIdMovimiento(),movimiento.getIdEspacio(), movimiento.getEntrada(), movimiento.getTarifa(), "Entrada registrada exitosamente");
             
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (HttpClientErrorException.NotFound e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontraron los datos solicitaods");
-        }catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al registrar la entrada: " + e.getMessage());
-
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No se encontraron los datos solicitados"
+            );
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al registrar la entrada: " + e.getMessage()
+            );
         }
-       
     }
 
     @Override
-    public ParkingSalidaResponse registrarSalida(ParkingSalidaRequest request, String token) {
+    @Transactional
+    public ParkingSalidaResponse registrarSalida(
+            ParkingSalidaRequest request,
+            String token) {
+
         verificarToken(token);
 
-        if(request.getClaveUsuario() == null || request.getPlaca() == null || request.getTiempoSalida() == null || request.getTiempoActualizacion() == null|| request.getCostoTotal() == null || request.getHorasCobradas() == null || request.getMinutosEstacionados() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faltan alguno de los datos requeridos: clave de usuario, placa, tiempo de salida, de actualizacion, costo total, las horas cobradas o los minutos estacionado");
+        if (request.getClaveUsuario() == null
+                || request.getClaveUsuario().isBlank()
+                || request.getPlaca() == null
+                || request.getPlaca().isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La clave del usuario y la placa son obligatorias"
+            );
         }
 
-        UsuarioResponse usuarioResponse = restTemplate.getForObject(userServiceUrl + request.getClaveUsuario(), UsuarioResponse.class);
-        if(usuarioResponse == null || Boolean.FALSE.equals(usuarioResponse.getStatus())){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no existe o su estatus no es activo");
+        try {
+            UsuarioResponse usuarioResponse = restTemplate.getForObject(
+                    userServiceUrl
+                            + "usuarios/clave/"
+                            + request.getClaveUsuario(),
+                    UsuarioResponse.class
+            );
+
+            if (usuarioResponse == null
+                    || !usuarioResponse.estaActivo()) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "El usuario no existe o su estatus no es activo"
+                );
+            }
+
+            ResponseEntity<VehiculoResponse[]> responseVehiculos =
+                    restTemplate.getForEntity(
+                            vehicleServiceUrl
+                                    + "usuario/"
+                                    + usuarioResponse.getIdUsuario(),
+                            VehiculoResponse[].class
+                    );
+
+            VehiculoResponse[] vehiculos = responseVehiculos.getBody();
+
+            if (vehiculos == null) {
+                vehiculos = new VehiculoResponse[0];
+            }
+
+            VehiculoResponse vehiculoResponse = null;
+
+            for (VehiculoResponse vehiculo : vehiculos) {
+                if (vehiculo.getPlaca() != null
+                        && vehiculo.getPlaca().equalsIgnoreCase(
+                                request.getPlaca())) {
+
+                    vehiculoResponse = vehiculo;
+                    break;
+                }
+            }
+
+            if (vehiculoResponse == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "El vehículo no pertenece al usuario indicado"
+                );
+            }
+
+            Movimiento movimiento =
+                    movimientoRepository.movimientosActivos(
+                            vehiculoResponse.getIdVehiculo());
+
+            if (movimiento == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe una entrada activa para ese vehículo"
+                );
+            }
+
+            LocalDateTime tiempoSalida = LocalDateTime.now();
+
+            long minutosCalculados = Duration.between(
+                    movimiento.getEntrada(),
+                    tiempoSalida
+            ).toMinutes();
+
+            int minutosEstacionados =
+                    (int) Math.max(0, minutosCalculados);
+
+            int horasCobradas = Math.max(
+                    1,
+                    (int) Math.ceil(minutosEstacionados / 60.0)
+            );
+
+            BigDecimal costoTotal = movimiento.getTarifa()
+                    .multiply(BigDecimal.valueOf(horasCobradas));
+
+            movimiento.setSalida(tiempoSalida);
+            movimiento.setTiempoActualizacion(tiempoSalida);
+            movimiento.setMinEstacionado(minutosEstacionados);
+            movimiento.setHorasCobradas(horasCobradas);
+            movimiento.setCostoTotal(costoTotal);
+
+            movimientoRepository.actualizarMovimiento(movimiento);
+
+            Espacio espacio =
+                    espacioRepository.buscarPorID(
+                            movimiento.getIdEspacio());
+
+            if (espacio != null) {
+                espacio.setOcupado(false);
+
+                espacioRepository.actualizarDisponibilidad(
+                        movimiento.getIdEspacio(),
+                        false
+                );
+            }
+
+            return new ParkingSalidaResponse(
+                    movimiento.getIdMovimiento(),
+                    movimiento.getEntrada(),
+                    movimiento.getSalida(),
+                    movimiento.getIdEspacio(),
+                    movimiento.getTarifa(),
+                    movimiento.getCostoTotal(),
+                    movimiento.getHorasCobradas(),
+                    "Salida registrada exitosamente"
+            );
+
+        } catch (ResponseStatusException e) {
+            throw e;
+
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No se encontraron los datos solicitados"
+            );
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al registrar la salida: " + e.getMessage()
+            );
         }
-
-        VehiculoResponse vehiculoResponse = restTemplate.getForObject(vehicleServiceUrl + request.getPlaca(), VehiculoResponse.class);
-        if(vehiculoResponse == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El vehiculo con la placa proporcionada no existe");
-        }
-
-        if(!vehiculoResponse.getIdUsuario().toString().equals(request.getClaveUsuario())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El vehiculo no pertenece al usuario que intenta ingresar");
-
-        }
-
-        Movimiento movimiento = movimientoRepository.movimientosActivos(vehiculoResponse.getIdVehiculo());
-        if(movimiento == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró ningun movimiento activo para el vehículo proporcionado");
-        }
-
-
-        movimiento.setIdMovimiento(movimiento.getIdMovimiento());
-        movimiento.setEntrada(movimiento.getEntrada());
-        movimiento.setSalida(LocalDateTime.now());
-        movimiento.setIdEspacio(movimiento.getIdEspacio());
-        movimiento.setTarifa(movimiento.getTarifa());
-        movimiento.setCostoTotal(movimiento.getCostoTotal());
-        movimiento.setHorasCobradas(movimiento.getHorasCobradas());
-
-        movimientoRepository.actualizarMovimiento(movimiento);
-
-
-        Espacio espacio = espacioRepository.buscarPorID(movimiento.getIdEspacio());
-        if (espacio != null) {
-            espacio.setOcupado(false);
-            espacioRepository.actualizarDisponibilidad(movimiento.getIdEspacio(), espacio.getOcupado() );
-        }
-        
-        return new ParkingSalidaResponse(movimiento.getIdMovimiento(), movimiento.getEntrada(), movimiento.getSalida(), movimiento.getIdEspacio(), movimiento.getTarifa(), movimiento.getCostoTotal(), movimiento.getHorasCobradas(), "");
-
-
     }
-
-
+    
     @Override
     public List<Espacio> consultarEspacios(String token) {
         verificarToken(token);
         return espacioRepository.buscarDisponibles();
     }
-    
-    
 }

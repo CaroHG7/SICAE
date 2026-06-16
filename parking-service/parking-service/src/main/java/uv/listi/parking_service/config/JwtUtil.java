@@ -16,7 +16,7 @@ public class JwtUtil {
 
     
     private final RestTemplate restTemplate;
-    private final String urlValidar="http://localhost:8080/auth/validate";
+    private final String urlValidar="http://localhost:8080/auth/validar";
 
     public JwtUtil(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -34,7 +34,7 @@ public class JwtUtil {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", token);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            ResponseEntity<TokenValidationResponse> response = restTemplate.exchange(urlValidar, HttpMethod.POST, entity, TokenValidationResponse.class);
+            ResponseEntity<TokenValidationResponse> response = restTemplate.exchange(urlValidar, HttpMethod.GET, entity, TokenValidationResponse.class);
 
             return response.getBody() != null && response.getBody().isValid();
         }catch (Exception e){

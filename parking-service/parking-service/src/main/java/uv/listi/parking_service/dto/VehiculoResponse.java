@@ -1,29 +1,18 @@
 package uv.listi.parking_service.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class VehiculoResponse {
-    
+
     private Integer idVehiculo;
     private String placa;
     private Integer idUsuario;
-    
+    private Boolean estatus;
 
-    public VehiculoResponse(Integer idVehiculo, String placa, Integer idUsuario) {
-        this.idVehiculo = idVehiculo;
-        this.placa = placa;
-        this.idUsuario = idUsuario;
+    public boolean estaActivo() {
+        return Boolean.TRUE.equals(estatus);
     }
-    public Integer getIdVehiculo() {
-        return idVehiculo;
-    }
-    public String getPlaca() {
-        return placa;
-    }
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-    
-    
 }

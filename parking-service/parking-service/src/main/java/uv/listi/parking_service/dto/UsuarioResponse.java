@@ -1,29 +1,18 @@
 package uv.listi.parking_service.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class UsuarioResponse {
-    
+
     private Integer idUsuario;
     private String claveUsuario;
-    private boolean status;
+    private String estatus;
 
-    
-
-    public UsuarioResponse(Integer idUsuario, String claveUsuario, boolean status) {
-        this.idUsuario = idUsuario;
-        this.claveUsuario = claveUsuario;
-        this.status = status;
+    public boolean estaActivo() {
+        return "1".equals(estatus)
+                || "true".equalsIgnoreCase(estatus);
     }
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
-    public String getClaveUsuario() {
-        return claveUsuario;
-    }
-    public boolean getStatus() {
-        return status;
-    }
-
 }
