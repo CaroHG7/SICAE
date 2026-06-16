@@ -9,13 +9,13 @@ services:
             MYSQL_ROOT_PASSWORD: root
         volumes:
             - datos_vehiculos:/var/lib/mysql
-            - ./databases/BD/MySQL/sicaevehiculo.sql
+            - ../databases/BD/MySQL/sicaevehiculo.sql:/docker-entrypoint-initdb.d/sicaevehiculo.sql
         networks:
             - sicae_network
 
 
     vehicle-service:
-        build: ./vehicle-service/vehicle-service
+        build: ../vehicle-service/vehicle-service
         container_name: vehicle-service
         ports:
             - "8082:8082"
@@ -33,9 +33,9 @@ services:
             - sicae_network
 
 
-    volumes:
+volumes:
         datos_vehiculos:
 
-    networks:
+networks:
         sicae_network:
             external: true

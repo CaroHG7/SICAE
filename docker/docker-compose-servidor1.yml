@@ -1,7 +1,7 @@
 services:
-    bd_usuarios:
+    bd-usuarios:
         image: postgres:16
-        container_name: bd_usuarios
+        container_name: bd-usuarios
         ports:
             - "5432:5432"
         environment:
@@ -10,14 +10,14 @@ services:
             POSTGRES_PASSWORD: root
         volumes:
             - datos_usuarios:/var/lib/postgresql/data
-            - ./databases/BD/PostgreSQL/sicaeUsuarios.sql:/docker-entrypoint-initdb.d/sicaeUsuarios.sql
+            - ../databases/BD/PostgreSQL/sicaeUsuarios.sql:/docker-entrypoint-initdb.d/sicaeUsuarios.sql
 
         networks:
             - sicae_network
 
 
     auth-service:
-        build: ./auth-service/auth-service
+        build: ../auth-service/auth-service
         container_name: auth-service
         ports:
             - "8080:8080"
@@ -36,7 +36,7 @@ services:
 
 
     user-service:
-        build: ./user-service/user-service/user-service
+        build: ../user-service/user-service/user-service
         container_name: user-service
         ports:
             - "8081:8081"
@@ -54,10 +54,10 @@ services:
             - sicae_network
     
     
-    volumes:
+volumes:
         datos_usuarios:
 
-    networks:
-        sicae_network:
+networks:
+    sicae_network:
         external: true
             
