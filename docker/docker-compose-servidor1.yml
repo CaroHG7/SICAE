@@ -1,63 +1,56 @@
 services:
-    bd-usuarios:
-        image: postgres:16
-        container_name: bd-usuarios
-        ports:
-            - "5432:5432"
-        environment:
-            POSTGRES_DB: sicae_usuarios
-            POSTGRES_USER: usuarioServidor1
-            POSTGRES_PASSWORD: S3rv1d0r1
-        volumes:
-            - datos_usuarios:/var/lib/postgresql/data
-            - ../databases/BD/PosgreSQL/sicaeUsuario.sql:/docker-entrypoint-initdb.d/sicaeUsuario.sql
+  bd-usuarios:
+    image: postgres:16
+    container_name: bd-usuarios
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: sicae_usuarios
+      POSTGRES_USER: usuarioServidor1
+      POSTGRES_PASSWORD: S3rv1d0r1
+    volumes:
+      - datos_usuarios:/var/lib/postgresql/data
+      - ../databases/BD/PosgreSQL/sicaeUsuario.sql:/docker-entrypoint-initdb.d/sicaeUsuario.sql
+    networks:
+      - sicae_network
 
-        networks:
-            - sicae_network
+  auth-service:
+    build: ../auth-service/auth-service
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bd-usuarios:5432/sicae_usuarios
+      SPRING_DATASOURCE_USERNAME: usuarioServidor1
+      SPRING_DATASOURCE_PASSWORD: S3rv1d0r1
+      JWT_SECRET: clave_secreta_sicae_auth_service
+    depends_on:
+      - bd-usuarios
+    networks:
+      - sicae_network
 
+  user-service:
+    build: ../user-service/user-service/user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bd-usuarios:5432/sicae_usuarios
+      SPRING_DATASOURCE_USERNAME: usuarioServidor1
+      SPRING_DATASOURCE_PASSWORD: S3rv1d0r1
+      JWT_SECRET: clave_secreta_sicae_auth_service
+      AUTH_SERVICE_URL: http://auth-service:8080
+    depends_on:
+      - bd-usuarios
+      - auth-service
+    networks:
+      - sicae_network
 
-    auth-service:
-        build: ../auth-service/auth-service
-        container_name: auth-service
-        ports:
-            - "8080:8080"
-        environment:
-            SERVER_PORT: 8080
-            SPRING_DATASOURCE_URL: jdbc:postgresql://bd-usuarios:5432/sicae_usuarios
-            SPRING_DATASOURCE_USERNAME: usuarioServidor1
-            SPRING_DATASOURCE_PASSWORD: S3rv1d0r1
-            JWT_SECRET: clave_secreta_sicae_auth_service
-        depends_on:
-            - bd-usuarios
-        networks:
-            - sicae_network
-
-
-
-
-    user-service:
-        build: ../user-service/user-service/user-service
-        container_name: user-service
-        ports:
-            - "8081:8081"
-        environment:
-            SERVER_PORT: 8081
-            SPRING_DATASOURCE_URL: jdbc:postgresql://bd-usuarios:5432/sicae_usuarios
-            SPRING_DATASOURCE_USERNAME: usuarioServidor1
-            SPRING_DATASOURCE_PASSWORD: S3rv1d0r1
-            JWT_SECRET: clave_secreta_sicae_auth_service
-            
-        depends_on:
-            - bd-usuarios
-            - auth-service
-        networks:
-            - sicae_network
-    
-    
 volumes:
-        datos_usuarios:
+  datos_usuarios:
 
 networks:
-    sicae_network:
-        external: true
-            
+  sicae_network:
+    external: true

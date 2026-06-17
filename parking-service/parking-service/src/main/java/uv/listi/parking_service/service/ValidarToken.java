@@ -1,5 +1,6 @@
 package uv.listi.parking_service.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,7 +14,8 @@ import uv.listi.parking_service.dto.TokenValidationResponse;
 public class ValidarToken {
 
     private final RestTemplate restTemplate;
-    private final String AUTH_URL = "http://localhost:8080/auth/validar";
+    @Value("${auth.service.url}")
+    private String authServiceUrl;
 
     public ValidarToken(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -29,7 +31,7 @@ public class ValidarToken {
 
             ResponseEntity<TokenValidationResponse> response =
                     restTemplate.exchange(
-                            AUTH_URL,
+                            authServiceUrl + "/auth/validar",
                             HttpMethod.GET,
                             entity,
                             TokenValidationResponse.class

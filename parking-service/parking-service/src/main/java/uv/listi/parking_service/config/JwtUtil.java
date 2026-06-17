@@ -1,7 +1,7 @@
 package uv.listi.parking_service.config;
 
 
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +16,8 @@ public class JwtUtil {
 
     
     private final RestTemplate restTemplate;
-    private final String urlValidar="http://localhost:8080/auth/validar";
+    @Value("${auth.service.url}")
+    private String authServiceUrl;
 
     public JwtUtil(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -34,7 +35,7 @@ public class JwtUtil {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", token);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            ResponseEntity<TokenValidationResponse> response = restTemplate.exchange(urlValidar, HttpMethod.GET, entity, TokenValidationResponse.class);
+            ResponseEntity<TokenValidationResponse> response = restTemplate.exchange(authServiceUrl + "/auth/validar", HttpMethod.GET, entity, TokenValidationResponse.class);
 
             return response.getBody() != null && response.getBody().isValid();
         }catch (Exception e){
