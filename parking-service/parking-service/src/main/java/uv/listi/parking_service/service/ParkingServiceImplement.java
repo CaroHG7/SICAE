@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +61,12 @@ public class ParkingServiceImplement implements ParkingService{
         }
     }
 
+    private HttpEntity<Void> crearPeticionConToken(String token) {
+    	HttpHeaders headers = new HttpHeaders();
+    	headers.set(HttpHeaders.AUTHORIZATION, token);
+    	return new HttpEntity<>(headers);
+    }
+
 
     @Override
     @Transactional
@@ -69,10 +78,15 @@ public class ParkingServiceImplement implements ParkingService{
         }
 
         try{
-            UsuarioResponse usuarioResponse = restTemplate.getForObject(
-                    userServiceUrl + "usuarios/clave/" + request.getClaveUsuario(),
-                    UsuarioResponse.class
-            );
+            ResponseEntity<UsuarioResponse> responseUsuario =
+        	    restTemplate.exchange(
+                	    userServiceUrl + "usuarios/clave/" + request.getClaveUsuario(),
+                	    HttpMethod.GET,
+                	    crearPeticionConToken(token),
+                	    UsuarioResponse.class
+         	     );
+
+	     UsuarioResponse usuarioResponse = responseUsuario.getBody();
 
             if (usuarioResponse == null || !usuarioResponse.estaActivo()) {
                 throw new ResponseStatusException(
@@ -82,8 +96,10 @@ public class ParkingServiceImplement implements ParkingService{
             }
 
             ResponseEntity<VehiculoResponse[]> responseVehiculos =
-                    restTemplate.getForEntity(
+                    restTemplate.exchange(
                             vehicleServiceUrl + "usuario/" + usuarioResponse.getIdUsuario(),
+			    HttpMethod.GET,
+			    crearPeticionConToken(token),
                             VehiculoResponse[].class
                     );
 
@@ -192,12 +208,16 @@ public class ParkingServiceImplement implements ParkingService{
         }
 
         try {
-            UsuarioResponse usuarioResponse = restTemplate.getForObject(
-                    userServiceUrl
-                            + "usuarios/clave/"
-                            + request.getClaveUsuario(),
-                    UsuarioResponse.class
-            );
+            ResponseEntity<UsuarioResponse> responseUsuario =
+        	    restTemplate.exchange(
+                	    userServiceUrl + "usuarios/clave/" + request.getClaveUsuario(),
+                	    HttpMethod.GET,
+                	    crearPeticionConToken(token),
+                            UsuarioResponse.class
+        	    );
+
+	     UsuarioResponse usuarioResponse = responseUsuario.getBody();
+
 
             if (usuarioResponse == null
                     || !usuarioResponse.estaActivo()) {
@@ -209,10 +229,12 @@ public class ParkingServiceImplement implements ParkingService{
             }
 
             ResponseEntity<VehiculoResponse[]> responseVehiculos =
-                    restTemplate.getForEntity(
+                    restTemplate.exchange(
                             vehicleServiceUrl
                                     + "usuario/"
                                     + usuarioResponse.getIdUsuario(),
+			    HttpMethod.GET,
+			    crearPeticionConToken(token),
                             VehiculoResponse[].class
                     );
 

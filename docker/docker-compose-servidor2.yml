@@ -5,8 +5,10 @@ services:
         ports:
             - "3307:3306"
         environment:
-            MYSQL_DATABASE: sicaevehiculo
-            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: sicaevehiculos
+            MYSQL_USER: usuarioServidor2
+            MYSQL_PASSWORD: s3rv1d0r2
+            MYSQL_ROOT_PASSWORD: c0ntr4s3ñ4ROOT
         volumes:
             - datos_vehiculos:/var/lib/mysql
             - ../databases/BD/MySQL/sicaevehiculo.sql:/docker-entrypoint-initdb.d/sicaevehiculo.sql
@@ -22,8 +24,8 @@ services:
         environment:
             SERVER_PORT: 8082
             SPRING_DATASOURCE_URL: jdbc:mysql://bd-vehiculos:3306/sicaevehiculos
-            SPRING_DATASOURCE_USERNAME: root
-            SPRING_DATASOURCE_PASSWORD: root
+            SPRING_DATASOURCE_USERNAME: usuarioServidor2
+            SPRING_DATASOURCE_PASSWORD: s3rv1d0r2
             AUTH_SERVICE_URL: http://auth-service:8080
             USER_SERVICE_URL: http://user-service:8081
         depends_on:
