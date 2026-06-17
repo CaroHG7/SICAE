@@ -7,6 +7,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class ErrorResponse {
 
+    private int status;
+    private String error;
+    private boolean success;
     private String message;
+    private String path;
+    
     
 }

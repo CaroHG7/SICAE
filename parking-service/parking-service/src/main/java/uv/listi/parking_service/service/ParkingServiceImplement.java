@@ -57,7 +57,9 @@ public class ParkingServiceImplement implements ParkingService{
         String tokenObtenido = jwtUtil.obtenerToken(token);
 
         if (tokenObtenido == null || !jwtUtil.validarToken(token)) {
+            
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No puede acceder. El token es inválido");
+
         }
     }
 
@@ -88,10 +90,24 @@ public class ParkingServiceImplement implements ParkingService{
 
 	     UsuarioResponse usuarioResponse = responseUsuario.getBody();
 
-            if (usuarioResponse == null || !usuarioResponse.estaActivo()) {
+            /**if (usuarioResponse == null || !usuarioResponse.estaActivo()) {
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN,
                         "El usuario no existe o su estatus no es activo"
+                );
+            }**/
+
+            if (usuarioResponse == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "El usuario no existe"
+                );
+            }
+
+            if (!usuarioResponse.estaActivo()) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "El estatus del usuario no es activo"
                 );
             }
 
@@ -146,7 +162,7 @@ public class ParkingServiceImplement implements ParkingService{
 
                 if (vehiculosDentro >= 2) {
                     throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
+                            HttpStatus.CONFLICT,
                             "El usuario ya tiene 2 vehículos dentro del estacionamiento"
                     );
                 }
@@ -154,8 +170,22 @@ public class ParkingServiceImplement implements ParkingService{
 
             
             Espacio espacio = espacioRepository.buscarPorID(request.getIdEspacio());
-            if(espacio == null|| Boolean.TRUE.equals(espacio.getOcupado())){
+            /**if(espacio == null|| Boolean.TRUE.equals(espacio.getOcupado())){
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "El espacio de estacionamiento no existe o ya esta ocupado");
+            }**/
+
+            if (espacio == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "El espacio de estacionamiento no exite"
+                );
+            }
+
+            if (Boolean.TRUE.equals(espacio.getOcupado())) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "El espacio de estacionamiento ya está ocupado"
+                );
             }
 
             espacio.setOcupado(true);
