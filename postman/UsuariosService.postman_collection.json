@@ -1,0 +1,61 @@
+{
+  "info": {
+    "_postman_id": "40d66ddb-8a0b-458c-bd79-1354eb1d7bf6",
+    "name": "SICAE",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54262919",
+    "_collection_link": "https://go.postman.co/collection/54262919-40d66ddb-8a0b-458c-bd79-1354eb1d7bf6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth Service",
+      "item": [
+        {
+          "name": "New Request",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Buscar usuario",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar un usuario",
+          "request": {
+            "method": "POST",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Editar usuario",
+          "request": {
+            "method": "PUT",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar status",
+          "request": {
+            "method": "PATCH",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

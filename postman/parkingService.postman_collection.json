@@ -1,0 +1,51 @@
+{
+  "info": {
+    "_postman_id": "de6861ed-5d2b-48a4-bd91-a78c081bb647",
+    "name": "parkingService",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54260866",
+    "_collection_link": "https://go.postman.co/collection/54260866-de6861ed-5d2b-48a4-bd91-a78c081bb647?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "UsuariosFei",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "ConsultarEspacios",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "EntradaParking",
+      "request": {
+        "method": "POST",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "SalidaParking",
+      "request": {
+        "method": "POST",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
