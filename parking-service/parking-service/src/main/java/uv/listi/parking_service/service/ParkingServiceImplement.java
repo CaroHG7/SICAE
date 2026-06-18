@@ -88,7 +88,7 @@ public class ParkingServiceImplement implements ParkingService{
                 	    UsuarioResponse.class
          	     );
 
-	     UsuarioResponse usuarioResponse = responseUsuario.getBody();
+	        UsuarioResponse usuarioResponse = responseUsuario.getBody();
 
             /**if (usuarioResponse == null || !usuarioResponse.estaActivo()) {
                 throw new ResponseStatusException(
