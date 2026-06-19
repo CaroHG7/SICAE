@@ -166,3 +166,42 @@ DROP VIEW IF EXISTS `movimientofullinfo`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `movimientofullinfo` AS select `m`.`idMovimiento` AS `idMovimiento`,`m`.`idVehiculo` AS `idVehiculo`,`m`.`tiempoEntrada` AS `tiempoEntrada`,`m`.`tiempoSalida` AS `tiempoSalida`,`m`.`minutosEstacionado` AS `minutosEstacionado`,`m`.`horasCobradas` AS `horasCobradas`,`m`.`costoTotal` AS `costoTotal`,`m`.`tarifaHora` AS `tarifaHora`,`m`.`tiempoCreacion` AS `tiempoCreacion`,`m`.`tiempoActualizacion` AS `tiempoActualizacion`,`m`.`idEspacio` AS `idEspacio`,`ee`.`claveEspacio` AS `claveEspacio`,`ee`.`tipo` AS `tipoEspacio` from (`movimiento` `m` join `espacioestacionamiento` `ee` on((0 <> `ee`.`idEspacio`)));
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+
+
+INSERT INTO movimiento
+(idVehiculo, tiempoEntrada, tiempoSalida,
+ minutosEstacionado, horasCobradas, costoTotal,
+ tarifaHora, tiempoCreacion, tiempoActualizacion, idEspacio)
+VALUES
+
+-- Carlos tiene 2 movimientos abiertos
+(1, '2026-06-18 08:00:00', NULL,
+ NULL, NULL, NULL,
+ 20.00, '2026-06-18 08:00:00', NULL, 1),
+
+(2, '2026-06-18 09:15:00', NULL,
+ NULL, NULL, NULL,
+ 20.00, '2026-06-18 09:15:00', NULL, 2),
+
+-- Ana tiene un movimiento abierto
+(4, '2026-06-18 10:30:00', NULL,
+ NULL, NULL, NULL,
+ 20.00, '2026-06-18 10:30:00', NULL, 3),
+
+-- Movimiento cerrado de Carlos
+(3, '2026-06-17 08:00:00', '2026-06-17 11:20:00',
+ 200, 4, 80.00,
+ 20.00, '2026-06-17 08:00:00', '2026-06-17 11:20:00', 4),
+
+-- Movimiento cerrado de Ana
+(5, '2026-06-16 14:00:00', '2026-06-16 15:10:00',
+ 70, 2, 40.00,
+ 20.00, '2026-06-16 14:00:00', '2026-06-16 15:10:00', 5),
+
+-- Movimiento cerrado de Roberto
+(8, '2026-06-15 09:00:00', '2026-06-15 13:45:00',
+ 285, 5, 100.00,
+ 20.00, '2026-06-15 09:00:00', '2026-06-15 13:45:00', 6);
