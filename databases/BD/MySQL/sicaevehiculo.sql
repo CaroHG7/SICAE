@@ -67,29 +67,39 @@ LOCK TABLES `vehiculo` WRITE;
 /*!40000 ALTER TABLE `vehiculo` DISABLE KEYS */;
 INSERT INTO `vehiculo` VALUES (1,2,'VEH001',1,'ABC1234','Negro',2020,'Vehiculo de prueba',_binary '');
 
-
-
 INSERT INTO vehiculo
-(idUsuario, claveVehiculo, idModelo, placa, color, anio, descripcion, estatus)
+(
+    idVehiculo,
+    idUsuario,
+    claveVehiculo,
+    idModelo,
+    placa,
+    color,
+    anio,
+    descripcion,
+    estatus
+)
 VALUES
--- Carlos, idUsuario 3: tiene 3 vehículos activos
-(3, 'VEH002', 1, 'CAR1234', 'Rojo', 2020, 'Toyota Corolla de Carlos', b'1'),
-(3, 'VEH003', 4, 'CAR5678', 'Azul', 2021, 'Honda Civic de Carlos', b'1'),
-(3, 'VEH004', 7, 'CAR9012', 'Negro', 2019, 'Nissan Sentra de Carlos', b'0'),
+-- Carlos, idUsuario 3: cuatro vehículos activos
+(2, 3, 'VEH002', 1,  'CAR1234', 'Rojo',   2020, 'Toyota Corolla de Carlos', b'1'),
+(3, 3, 'VEH003', 4,  'CAR5678', 'Azul',   2021, 'Honda Civic de Carlos', b'1'),
+(4, 3, 'VEH004', 7,  'CAR9012', 'Negro',  2019, 'Nissan Sentra de Carlos', b'1'),
+(5, 3, 'VEH005', 10, 'CAR3456', 'Blanco', 2022, 'Chevrolet Aveo de Carlos', b'1'),
 
--- Ana, idUsuario 4: tiene 2 vehículos activos
-(4, 'VEH006', 2, 'ANA1234', 'Gris', 2020, 'Toyota Yaris de Ana', b'1'),
-(4, 'VEH007', 22, 'ANA5678', 'Plata', 2023, 'Kia Rio de Ana', b'1'),
+-- Ana, idUsuario 4: dos vehículos activos
+(6, 4, 'VEH006', 2,  'ANA1234', 'Gris',  2020, 'Toyota Yaris de Ana', b'1'),
+(7, 4, 'VEH007', 22, 'ANA5678', 'Plata', 2023, 'Kia Rio de Ana', b'1'),
 
 -- Luis, idUsuario 5: usuario desactivado con vehículo activo
-(5, 'VEH008', 10, 'LUI1234', 'Negro', 2018, 'Vehículo de usuario desactivado', b'1'),
+(8, 5, 'VEH008', 10, 'LUI1234', 'Negro', 2018, 'Vehículo de usuario desactivado', b'1'),
 
--- Mariana, idUsuario 6: usuario desactivado con vehículo desactivado
-(6, 'VEH009', 19, 'MAR1234', 'Rojo', 2019, 'Vehículo desactivado', b'0'),
+-- Mariana, idUsuario 6: usuario y vehículo desactivados
+(9, 6, 'VEH009', 19, 'MAR1234', 'Rojo', 2019, 'Vehículo desactivado', b'0'),
 
 -- Roberto, idUsuario 7: vehículo desactivado
-(7, 'VEH010', 28, 'ROB1234', 'Azul', 2021, 'BMW Serie 3 desactivado', b'0');
+(10, 7, 'VEH010', 28, 'ROB1234', 'Azul', 2021, 'BMW Serie 3 desactivado', b'0');
 
+ALTER TABLE vehiculo AUTO_INCREMENT = 11;
 
 /*!40000 ALTER TABLE `vehiculo` ENABLE KEYS */;
 UNLOCK TABLES;
