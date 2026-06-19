@@ -17,6 +17,8 @@ import uv.listi.user_service.dto.UsuarioPerfilResponse;
 import uv.listi.user_service.dto.UsuarioRegistroRequest;
 import uv.listi.user_service.dto.UsuarioResponse;
 import uv.listi.user_service.service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -32,12 +34,22 @@ public class UsuarioController {
     public String test() {
         return "UserService funcionando correctamente con BD oficial";
     }
-
+    
     @PostMapping //crear usuario
-    public ResponseEntity<UsuarioResponse> registrarUsuario(
-            @Valid @RequestBody UsuarioRegistroRequest request) {
+    public ResponseEntity<?> registrarUsuario(
+            @Valid @RequestBody UsuarioRegistroRequest requestDto,
+            HttpServletRequest request) { 
 
-        UsuarioResponse response = usuarioService.registrarUsuario(request);
+       
+        Integer idRolToken = (Integer) request.getAttribute("idRolAuth");
+
+        // solo admin puede registrar
+        if (idRolToken == null || idRolToken != 1) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new UsuarioResponse(false, "No tienes permisos de administrador para realizar esta acción"));
+        }
+
+        UsuarioResponse response = usuarioService.registrarUsuario(requestDto);
 
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -45,9 +57,14 @@ public class UsuarioController {
 
         return ResponseEntity.badRequest().body(response);
     }
-
+    
     @GetMapping("/{idUsuario}") //info usuario x id
-    public ResponseEntity<?> obtenerPerfil(@PathVariable Integer idUsuario) {
+    public ResponseEntity<?> obtenerPerfil(
+            @PathVariable Integer idUsuario,
+            HttpServletRequest request) { //leemos token
+
+        Integer idRolToken = (Integer) request.getAttribute("idRolAuth");
+        String usernameAutenticado = (String) request.getAttribute("usuarioAuth");
 
         UsuarioPerfilResponse perfil = usuarioService.obtenerPerfil(idUsuario);
 
@@ -57,22 +74,40 @@ public class UsuarioController {
             );
         }
 
+        boolean esAdministrador = (idRolToken != null && idRolToken == 1);
+        boolean esMismoUsuario = perfil.getUsername() != null && perfil.getUsername().equals(usernameAutenticado);
+
+        if (!esAdministrador && !esMismoUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    new UsuarioResponse(false, "Acceso denegado: No tienes permiso para visualizar este perfil.")
+            );
+        }
+
         return ResponseEntity.ok(perfil);
     }
 
-    @GetMapping("/clave/{claveUsuario}")
+    @GetMapping("/clave/{claveUsuario}") // info usuario x claveUsuario
     public ResponseEntity<?> obtenerPerfilPorClave(
-            @PathVariable String claveUsuario) {
+            @PathVariable String claveUsuario,
+            HttpServletRequest request) { 
 
-        UsuarioPerfilResponse perfil =
-                usuarioService.obtenerPerfilPorClave(claveUsuario);
+        Integer idRolToken = (Integer) request.getAttribute("idRolAuth");
+        String usernameAutenticado = (String) request.getAttribute("usuarioAuth");
+
+        UsuarioPerfilResponse perfil = usuarioService.obtenerPerfilPorClave(claveUsuario);
 
         if (perfil == null) {
             return ResponseEntity.badRequest().body(
-                    new UsuarioResponse(
-                            false,
-                            "No se encontró el usuario solicitado"
-                    )
+                    new UsuarioResponse(false, "No se encontró el usuario solicitado")
+            );
+        }
+
+        boolean esAdministrador = (idRolToken != null && idRolToken == 1);
+        boolean esMismoUsuario = perfil.getUsername() != null && perfil.getUsername().equals(usernameAutenticado);
+
+        if (!esAdministrador && !esMismoUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    new UsuarioResponse(false, "Acceso denegado: No tienes permiso para visualizar este perfil.")
             );
         }
 
@@ -80,11 +115,30 @@ public class UsuarioController {
     }
     
     @PutMapping("/{idUsuario}") //editar
-    public ResponseEntity<UsuarioResponse> editarUsuario(
+    public ResponseEntity<?> editarUsuario(
             @PathVariable Integer idUsuario,
-            @Valid @RequestBody UsuarioEditarRequest request) {
+            @Valid @RequestBody UsuarioEditarRequest requestDto,
+            HttpServletRequest request) { 
 
-        UsuarioResponse response = usuarioService.editarUsuario(idUsuario, request);
+        Integer idRolToken = (Integer) request.getAttribute("idRolAuth");
+        String usernameAutenticado = (String) request.getAttribute("usuarioAuth");
+
+        UsuarioPerfilResponse usuarioAEditar = usuarioService.obtenerPerfil(idUsuario);
+
+        if (usuarioAEditar == null) {
+            return ResponseEntity.badRequest().body(new UsuarioResponse(false, "El usuario no existe"));
+        }
+
+        //si no es admin ni es el propio usuario intentando editar sus propios datos
+        boolean esAdministrador = (idRolToken != null && idRolToken == 1);
+        boolean esMismoUsuario = usuarioAEditar.getUsername().equals(usernameAutenticado);
+
+        if (!esAdministrador && !esMismoUsuario) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new UsuarioResponse(false, "Acceso denegado: No tienes permiso para editar este perfil."));
+        }
+
+        UsuarioResponse response = usuarioService.editarUsuario(idUsuario, requestDto);
 
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -92,18 +146,30 @@ public class UsuarioController {
 
         return ResponseEntity.badRequest().body(response);
     }
-
+    
     @PatchMapping("/{idUsuario}/estatus") //cambiar estatus
-    public ResponseEntity<UsuarioResponse> cambiarEstatus(
+    public ResponseEntity<?> cambiarEstatus(
             @PathVariable Integer idUsuario,
-            @Valid @RequestBody UsuarioEstatusRequest request) {
+            @Valid @RequestBody UsuarioEstatusRequest requestDto,
+            HttpServletRequest request) {
 
-        UsuarioResponse response = usuarioService.cambiarEstatus(idUsuario, request);
-
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
+        //solo admin
+        Integer idRolToken = (Integer) request.getAttribute("idRolAuth");
+        if (idRolToken == null || idRolToken != 1) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new UsuarioResponse(false, "Acceso denegado: Solo los administradores pueden cambiar el estatus."));
         }
 
-        return ResponseEntity.badRequest().body(response);
+        try {
+            UsuarioResponse response = usuarioService.cambiarEstatus(idUsuario, requestDto);
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            }
+            return ResponseEntity.badRequest().body(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new UsuarioResponse(false, e.getMessage()));
+        }
     }
 }

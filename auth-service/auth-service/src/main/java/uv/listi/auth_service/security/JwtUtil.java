@@ -111,6 +111,25 @@ public class JwtUtil {
             return null;
         }
     }
+    
+    public Integer obtenerIdRol(String token) {
+        if (!validarToken(token)) {
+            return null;
+        }
+
+        try {
+            String[] parts = token.split("\\.");
+            String payloadJson = decodificarPayload(parts[1]);
+            String idRolString = obtenerValorNumericoClaim(payloadJson, "idRol");
+            
+            if (idRolString != null) {
+                return Integer.parseInt(idRolString);
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     private String calcularFirma(String data) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");

@@ -5,14 +5,16 @@ public class TokenValidationResponse {
     private boolean valid;
     private String mensaje;
     private String usuario;
+    private Integer idRol;
 
     public TokenValidationResponse() {
     }
-
-    public TokenValidationResponse(boolean valid, String mensaje, String usuario) {
+    
+    public TokenValidationResponse(boolean valid, String mensaje, String usuario, Integer idRol) {
         this.valid = valid;
         this.mensaje = mensaje;
         this.usuario = usuario;
+        this.idRol = idRol;
     }
 
     public boolean isValid() {
@@ -37,5 +39,13 @@ public class TokenValidationResponse {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+    
+    public Integer getIdRol() { 
+        return idRol; 
+    }
+    
+    public void setIdRol(Integer idRol) { 
+        this.idRol = idRol; 
     }
 }

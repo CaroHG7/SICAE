@@ -15,7 +15,7 @@ public class AuthServiceClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public boolean validarToken(String token) {
+    public TokenValidationResponse validarToken(String token){
 
         try {
 
@@ -33,11 +33,10 @@ public class AuthServiceClient {
                             TokenValidationResponse.class
                     );
 
-            return response.getBody() != null
-                    && response.getBody().isValid();
+            return response.getBody();
 
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
     

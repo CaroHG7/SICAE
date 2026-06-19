@@ -37,11 +37,12 @@ public class AuthController {
     @GetMapping("/validar")
     public TokenValidationResponse validar(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || authHeader.trim().isEmpty()) {
-            return new TokenValidationResponse(false, "Token no proporcionado", null);
+           
+            return new TokenValidationResponse(false, "Token no proporcionado", null, null);
         }
 
         if (!authHeader.startsWith("Bearer ")) {
-            return new TokenValidationResponse(false, "Formato de token inválido", null);
+            return new TokenValidationResponse(false, "Formato de token inválido", null, null);
         }
 
         String token = authHeader.substring(7);
@@ -49,13 +50,16 @@ public class AuthController {
         try {
             boolean esValido = jwtUtil.validarToken(token);
             if (!esValido) {
-                return new TokenValidationResponse(false, "Token inválido o expirado", null);
+                return new TokenValidationResponse(false, "Token inválido o expirado", null, null);
             }
 
             String usuario = jwtUtil.obtenerUsuario(token);
-            return new TokenValidationResponse(true, "Token válido", usuario);
+            Integer idRol = jwtUtil.obtenerIdRol(token); 
+
+            return new TokenValidationResponse(true, "Token válido", usuario, idRol);
+            
         } catch (Exception e) {
-            return new TokenValidationResponse(false, "Token inválido o expirado", null);
+            return new TokenValidationResponse(false, "Token inválido o expirado", null, null);
         }
     }
 }

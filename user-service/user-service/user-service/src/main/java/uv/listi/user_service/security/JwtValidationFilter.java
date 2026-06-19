@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+import uv.listi.user_service.dto.TokenValidationResponse;
 import java.io.IOException;
 
 @Component
@@ -16,8 +16,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
     private final AuthServiceClient authServiceClient;
 
-    public JwtValidationFilter(
-            AuthServiceClient authServiceClient) {
+    public JwtValidationFilter(AuthServiceClient authServiceClient) {
         this.authServiceClient = authServiceClient;
     }
 
@@ -35,24 +34,19 @@ public class JwtValidationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader =
-                request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null ||
-                !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-            response.sendError(
-                    HttpServletResponse.SC_UNAUTHORIZED,
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                     "Token requerido"
             );
             return;
         }
 
-        boolean valido =
-                authServiceClient.validarToken(authHeader);
-
-        if (!valido) {
-
+        TokenValidationResponse tokenInfo = authServiceClient.validarToken(authHeader);
+        
+        if (tokenInfo == null || !tokenInfo.isValid()) {
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Token inválido"
@@ -60,6 +54,11 @@ public class JwtValidationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // guardamos la información del usuario y su rol en los atributos 
+        request.setAttribute("usuarioAuth", tokenInfo.getUsuario());
+        request.setAttribute("idRolAuth", tokenInfo.getIdRol());
+        
         filterChain.doFilter(request, response);
     }
+    
 }

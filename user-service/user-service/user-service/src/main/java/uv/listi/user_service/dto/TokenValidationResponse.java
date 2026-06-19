@@ -6,6 +6,7 @@ public class TokenValidationResponse {
     private boolean valid;
     private String mensaje;
     private String usuario;
+    private Integer idRol;
 
     public boolean isValid() {
         return valid;
@@ -29,5 +30,13 @@ public class TokenValidationResponse {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+    
+    public Integer getIdRol() {
+        return idRol;
+    }
+
+    public void setIdRol(Integer idRol) {
+        this.idRol = idRol;
     }
 }

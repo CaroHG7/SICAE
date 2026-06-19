@@ -118,15 +118,26 @@ public class UsuarioService {
 
         return new UsuarioResponse(false, "No se pudo actualizar el usuario");
     }
-
+    
     public UsuarioResponse cambiarEstatus(Integer idUsuario, UsuarioEstatusRequest request) {
 
         if (idUsuario == null || idUsuario <= 0) {
             return new UsuarioResponse(false, "El idUsuario no es válido");
         }
 
-        if (usuarioRepository.existeUsuarioPorId(idUsuario) == 0) {
+        if (request.getIdRol() == null || request.getIdRol() <= 0) {
+            return new UsuarioResponse(false, "El idRol es obligatorio");
+        }
+
+        UsuarioPerfilResponse perfilActual = usuarioRepository.obtenerPerfilPorId(idUsuario);
+        if (perfilActual == null) {
             return new UsuarioResponse(false, "No existe el usuario solicitado");
+        }
+
+        if (perfilActual.getEstatus() != null && perfilActual.getEstatus().equals(request.getEstatus())) {
+            String accion = request.getEstatus() ? "activar" : "desactivar";
+            String estado = request.getEstatus() ? "activo" : "inactivo";
+            throw new IllegalArgumentException("No se puede " + accion + " el usuario pq ya se encuentra " + estado);
         }
 
         int filasAfectadas = usuarioRepository.cambiarEstatus(idUsuario, request.getEstatus());
