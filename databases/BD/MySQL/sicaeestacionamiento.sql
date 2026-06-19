@@ -167,41 +167,51 @@ CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `movimientofullinfo` AS s
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-
-
-
-
 INSERT INTO movimiento
-(idVehiculo, tiempoEntrada, tiempoSalida,
- minutosEstacionado, horasCobradas, costoTotal,
- tarifaHora, tiempoCreacion, tiempoActualizacion, idEspacio)
+(
+    idVehiculo,
+    tiempoEntrada,
+    tiempoSalida,
+    minutosEstacionado,
+    horasCobradas,
+    costoTotal,
+    tarifaHora,
+    tiempoCreacion,
+    tiempoActualizacion,
+    idEspacio
+)
 VALUES
-
--- Carlos tiene 2 movimientos abiertos
-(1, '2026-06-18 08:00:00', NULL,
- NULL, NULL, NULL,
+-- Carlos tiene dos movimientos abiertos
+(2, '2026-06-18 08:00:00', NULL, NULL, NULL, NULL,
  20.00, '2026-06-18 08:00:00', NULL, 1),
 
-(2, '2026-06-18 09:15:00', NULL,
- NULL, NULL, NULL,
+(3, '2026-06-18 09:15:00', NULL, NULL, NULL, NULL,
  20.00, '2026-06-18 09:15:00', NULL, 2),
 
 -- Ana tiene un movimiento abierto
-(4, '2026-06-18 10:30:00', NULL,
- NULL, NULL, NULL,
+(6, '2026-06-18 10:30:00', NULL, NULL, NULL, NULL,
  20.00, '2026-06-18 10:30:00', NULL, 3),
 
 -- Movimiento cerrado de Carlos
-(3, '2026-06-17 08:00:00', '2026-06-17 11:20:00',
- 200, 4, 80.00,
- 20.00, '2026-06-17 08:00:00', '2026-06-17 11:20:00', 4),
+(4, '2026-06-17 08:00:00', '2026-06-17 11:20:00',
+ 200, 4, 80.00, 20.00,
+ '2026-06-17 08:00:00', '2026-06-17 11:20:00', 4),
 
 -- Movimiento cerrado de Ana
-(5, '2026-06-16 14:00:00', '2026-06-16 15:10:00',
- 70, 2, 40.00,
- 20.00, '2026-06-16 14:00:00', '2026-06-16 15:10:00', 5),
+(7, '2026-06-16 14:00:00', '2026-06-16 15:10:00',
+ 70, 2, 40.00, 20.00,
+ '2026-06-16 14:00:00', '2026-06-16 15:10:00', 5),
 
 -- Movimiento cerrado de Roberto
-(8, '2026-06-15 09:00:00', '2026-06-15 13:45:00',
- 285, 5, 100.00,
- 20.00, '2026-06-15 09:00:00', '2026-06-15 13:45:00', 6);
+(10, '2026-06-15 09:00:00', '2026-06-15 13:45:00',
+ 285, 5, 100.00, 20.00,
+ '2026-06-15 09:00:00', '2026-06-15 13:45:00', 6);
+
+-- Los espacios con movimientos abiertos deben aparecer ocupados
+UPDATE espacioestacionamiento
+SET ocupado = b'1'
+WHERE idEspacio IN (1, 2, 3);
+
+UPDATE espacioestacionamiento
+SET ocupado = b'0'
+WHERE idEspacio NOT IN (1, 2, 3);
