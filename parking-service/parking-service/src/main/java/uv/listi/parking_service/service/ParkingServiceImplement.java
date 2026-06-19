@@ -150,6 +150,23 @@ public class ParkingServiceImplement implements ParkingService{
                 );
             }
 
+
+
+            Movimiento movimientoActivo =
+                    movimientoRepository.movimientosActivos(
+                            vehiculoResponse.getIdVehiculo()
+                    );
+
+            if (movimientoActivo != null) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "El vehículo ya se encuentra dentro del estacionamiento"
+                );
+            }
+
+
+
+
             String vehiculosUsuarioStr = java.util.Arrays.stream(vehiculos)
                     .map(VehiculoResponse::getIdVehiculo)
                     .filter(java.util.Objects::nonNull)
@@ -323,7 +340,7 @@ public class ParkingServiceImplement implements ParkingService{
                     .multiply(BigDecimal.valueOf(horasCobradas));
 
             movimiento.setSalida(tiempoSalida);
-            movimiento.setTiempoActualizacion(tiempoSalida);
+            movimiento.setTiempoActualizacion(LocalDateTime.now());
             movimiento.setMinEstacionado(minutosEstacionados);
             movimiento.setHorasCobradas(horasCobradas);
             movimiento.setCostoTotal(costoTotal);

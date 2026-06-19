@@ -285,6 +285,28 @@ COPY public.usuario ("idUsuario", nombre, "apellidoPaterno", "apellidoMaterno", 
 \.
 
 
+
+INSERT INTO public.usuario
+("idUsuario", nombre, "apellidoPaterno", "apellidoMaterno", "claveUsuario", email, telefono, username, password, estatus, "idRol", "idTipoUsuario", "idProgramaEducativo", "tiempoCreacion", "tempoActualizacion")
+VALUES
+-- Usuario activo con 4 vehículos
+(3, 'Carlos', 'Ramirez', 'Lopez', 'CARLOS01', 'carlos@uv.mx', '2281111111', 'carlos', '12345', B'1', 2, 3, 3, NOW(), NULL),
+
+-- Usuario activo con 2 vehículos
+(4, 'Ana', 'Torres', 'Mendez', 'ANA02', 'ana@uv.mx', '2282222222', 'ana', '12345', B'1', 2, 3, 4, NOW(), NULL),
+
+-- Usuario desactivado
+(5, 'Luis', 'Garcia', 'Perez', 'LUIS03', 'luis@uv.mx', '2283333333', 'luis', '12345', B'0', 2, 3, 3, NOW(), NOW()),
+
+-- Otro usuario desactivado
+(6, 'Mariana', 'Hernandez', 'Soto', 'MARI04', 'mariana@uv.mx', '2284444444', 'mariana', '12345', B'0', 1, 2, 1, NOW(), NOW()),
+
+-- Otro usuario activo de rol administrador
+(7, 'Roberto', 'Diaz', 'Cruz', 'ROBER05', 'roberto@uv.mx', '2285555555', 'roberto', '12345', B'1', 1, 1, 3, NOW(), NULL);
+
+
+SELECT setval('public."usuario_idUsuario_seq1"', 7, true);
+
 --
 -- Name: programaEducativo_idPrograma_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
